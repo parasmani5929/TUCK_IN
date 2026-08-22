@@ -1,6 +1,8 @@
 const { MongoClient } = require('mongodb');
 const dns = require('dns');
-dns.setServers(['8.8.8.8', '8.8.4.4']); // Fix for ISP DNS blocking
+if (!process.env.VERCEL) {
+  dns.setServers(['8.8.8.8', '8.8.4.4']); // Fix for local ISP DNS blocking
+}
 require('dotenv').config({ path: '../.env' });
 
 let db;
