@@ -24,7 +24,7 @@ const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024
 // GET /api/admin/food  — list all food items (newest first)
 router.get('/', adminMiddleware, async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const foods = await db.collection('food_items').find({}).sort({ _id: -1 }).toArray();
     res.json(foods);
   } catch (err) {
@@ -42,7 +42,7 @@ router.post('/', adminMiddleware, upload.single('image'), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: 'An image file is required.' });
     }
-    const db = getDB();
+    const db = await getDB();
     const imagePath = 'uploads/' + req.file.filename;
     const result = await db.collection('food_items').insertOne({
       name: name.trim(),
@@ -61,7 +61,7 @@ router.post('/', adminMiddleware, upload.single('image'), async (req, res) => {
 router.put('/:id', adminMiddleware, upload.single('image'), async (req, res) => {
   try {
     const { name, description, price, category } = req.body;
-    const db = getDB();
+    const db = await getDB();
     const updates = {};
     if (name) updates.name = name.trim();
     if (description) updates.description = description.trim();
@@ -83,7 +83,7 @@ router.put('/:id', adminMiddleware, upload.single('image'), async (req, res) => 
 // DELETE /api/admin/food/:id  — delete food item
 router.delete('/:id', adminMiddleware, async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const result = await db.collection('food_items').deleteOne({ _id: new ObjectId(req.params.id) });
     if (result.deletedCount === 0) return res.status(404).json({ message: 'Food item not found.' });
     res.json({ message: 'Food item deleted successfully.' });

@@ -12,7 +12,7 @@ router.post('/:foodId', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Rating must be an integer between 1 and 5.' });
     }
 
-    const db = getDB();
+    const db = await getDB();
     const food_id = new ObjectId(req.params.foodId);
     const user_id = new ObjectId(req.user.id);
 
@@ -49,7 +49,7 @@ router.post('/:foodId', authMiddleware, async (req, res) => {
 // GET /api/ratings/:foodId  — get rating summary for a food item
 router.get('/:foodId', async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const food_id = new ObjectId(req.params.foodId);
     const all = await db.collection('food_ratings').find({ food_id }).toArray();
     const avg = all.length > 0 ? all.reduce((sum, r) => sum + r.rating, 0) / all.length : 0;

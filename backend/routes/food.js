@@ -7,7 +7,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 // GET /api/food  — list all food items, optional ?search=
 router.get('/', async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     let query = {};
     if (req.query.search) {
       query = { name: { $regex: req.query.search, $options: 'i' } };
@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
 router.post('/rate', authMiddleware, async (req, res) => {
   try {
     const { food_id, rating } = req.body;
-    const db = getDB();
+    const db = await getDB();
     
     // In a real app, you might track ratings per user in a 'food_ratings' collection
     // Here we'll just update the food_items collection with a simple average logic
@@ -56,7 +56,7 @@ router.post('/rate', authMiddleware, async (req, res) => {
 // GET /api/food/:id — single food item
 router.get('/:id', async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const food = await db.collection('food_items').findOne({ _id: new ObjectId(req.params.id) });
     if (!food) return res.status(404).json({ message: 'Food item not found.' });
     res.json(food);

@@ -17,7 +17,7 @@ router.post('/', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Payment method must be "upi" or "cod".' });
     }
 
-    const db = getDB();
+    const db = await getDB();
     let total_price = 0;
     const items = [];
 
@@ -75,7 +75,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // GET /api/orders/my-orders  — all orders for logged in user
 router.get('/my-orders', authMiddleware, async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const orders = await db
       .collection('orders')
       .find({ user_id: new ObjectId(req.user.id) })
@@ -90,7 +90,7 @@ router.get('/my-orders', authMiddleware, async (req, res) => {
 // GET /api/orders/track  — latest order for logged in user
 router.get('/track', authMiddleware, async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const order = await db
       .collection('orders')
       .find({ user_id: new ObjectId(req.user.id) })
@@ -107,7 +107,7 @@ router.get('/track', authMiddleware, async (req, res) => {
 // GET /api/orders/:id  — get order by id
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const order = await db.collection('orders').findOne({ _id: new ObjectId(req.params.id) });
     if (!order) return res.status(404).json({ message: 'Order not found.' });
     res.json(order);
@@ -119,7 +119,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 // POST /api/orders/:id/verify-payment  — mark UPI order as paid + send email
 router.post('/:id/verify-payment', authMiddleware, async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const order = await db.collection('orders').findOne({ _id: new ObjectId(req.params.id) });
     if (!order) return res.status(404).json({ message: 'Order not found.' });
 

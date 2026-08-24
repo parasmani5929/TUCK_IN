@@ -11,7 +11,7 @@ router.post('/register', async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
-    const db = getDB();
+    const db = await getDB();
     const existing = await db.collection('admin').findOne({ email });
     if (existing) return res.status(409).json({ message: 'Email already registered.' });
 
@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: 'Email and password required.' });
 
-    const db = getDB();
+    const db = await getDB();
     const admin = await db.collection('admin').findOne({ email });
     if (!admin || !(await bcrypt.compare(password, admin.password))) {
       return res.status(401).json({ message: 'Invalid email or password.' });

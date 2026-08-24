@@ -9,7 +9,7 @@ const VALID_STATUSES = ['Pending', 'Paid', 'Preparing', 'On the Way', 'Out for D
 // GET /api/admin/orders  — all orders, enriched with user & food names
 router.get('/', adminMiddleware, async (req, res) => {
   try {
-    const db = getDB();
+    const db = await getDB();
     const orders = await db.collection('orders').find({}).sort({ order_date: -1 }).toArray();
 
     // Enrich orders with user name and food names (batched)
@@ -54,7 +54,7 @@ router.put('/:id/status', adminMiddleware, async (req, res) => {
       });
     }
 
-    const db = getDB();
+    const db = await getDB();
     const result = await db.collection('orders').updateOne(
       { _id: new ObjectId(req.params.id) },
       { $set: { status } }

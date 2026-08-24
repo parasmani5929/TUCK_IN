@@ -14,7 +14,7 @@ router.post('/register', async (req, res) => {
     if (!name || !email || !password || !phone || !address) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
-    const db = getDB();
+    const db = await getDB();
     const existing = await db.collection('users').findOne({ email });
     if (existing) return res.status(409).json({ message: 'Email already registered.' });
 
@@ -32,7 +32,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: 'Email and password required.' });
 
-    const db = getDB();
+    const db = await getDB();
     const user = await db.collection('users').findOne({ email });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid email or password.' });
@@ -55,7 +55,7 @@ router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: 'Email is required.' });
 
-    const db = getDB();
+    const db = await getDB();
     const user = await db.collection('users').findOne({ email });
     // Always respond OK to prevent email enumeration
     if (!user) return res.json({ message: 'If that email exists, a reset link has been sent.' });
@@ -94,7 +94,7 @@ router.post('/reset-password', async (req, res) => {
     const { token, password } = req.body;
     if (!token || !password) return res.status(400).json({ message: 'Token and new password are required.' });
 
-    const db = getDB();
+    const db = await getDB();
     const user = await db.collection('users').findOne({
       resetToken: token,
       resetTokenExpiry: { $gt: new Date() },
