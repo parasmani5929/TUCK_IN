@@ -4,7 +4,7 @@ const path = require('path');
 require('dotenv').config({ path: '../.env' });
 
 const { connectDB } = require('./db');
-
+  
 const authRoutes = require('./routes/auth');
 const adminAuthRoutes = require('./routes/adminAuth');
 const foodRoutes = require('./routes/food');
