@@ -7,7 +7,7 @@ const { connectDB } = require('./db');
   
 const authRoutes = require('./routes/auth');
 const adminAuthRoutes = require('./routes/adminAuth');
-const foodRoutes = require('./routes/food');
+const foodRoutes = require('./routes/food'); 
 const adminFoodRoutes = require('./routes/adminFood');
 const ordersRoutes = require('./routes/orders');
 const adminOrdersRoutes = require('./routes/adminOrders');
