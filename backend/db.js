@@ -5,33 +5,36 @@ if (!process.env.VERCEL) {
 }
 require('dotenv').config({ path: '../.env' });
 
-let db;
-let client;
-
-let connectPromise;
-
-async function connectDB() {
-  if (connectPromise) return connectPromise;
-  
-  connectPromise = (async () => {
-    const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
-    const dbName = process.env.MONGODB_DB || 'food_ordering';
-
-    client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
-    await client.connect();
-    db = client.db(dbName);
-    console.log(`✅ Connected to MongoDB: ${dbName}`);
-    return db;
-  })();
-  
-  return connectPromise;
-}
+let cachedClient = null;
+let cachedDb = null;
 
 async function getDB() {
-  if (!db) {
-    await connectDB();
+  if (cachedClient && cachedDb) {
+    return cachedDb;
   }
-  return db;
+
+  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
+  const dbName = process.env.MONGODB_DB || 'food_ordering';
+
+  const client = new MongoClient(uri, { 
+    serverSelectionTimeoutMS: 5000,
+    maxPoolSize: 10,
+    socketTimeoutMS: 45000,
+  });
+  
+  try {
+    await client.connect();
+    cachedClient = client;
+    cachedDb = client.db(dbName);
+    console.log(`✅ Connected to MongoDB: ${dbName}`);
+    return cachedDb;
+  } catch (err) {
+    console.error('❌ MongoDB Connection Error:', err);
+    cachedClient = null;
+    cachedDb = null;
+    throw err;
+  }
 }
 
-module.exports = { connectDB, getDB };
+// Keep connectDB alias for backward compatibility with server.js
+module.exports = { connectDB: getDB, getDB };
